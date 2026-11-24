@@ -20,17 +20,17 @@ import {
 } from './vendor/makefun-bot.ts';
 
 const SOL = LAMPORTS_PER_SOL;
-const FIRST_BUY = (SOL * 5n) / 100n; // 0.05 SOL
-const PYRAMID_BUY = (SOL * 20n) / 100n; // 0.20 SOL per batch
-const MAX_STAKE = SOL * 2n; // 2 SOL total per position
-const MAX_EXPOSURE = SOL * 6n; // 6 SOL total across positions
+const FIRST_BUY = (SOL * 2n) / 100n; // 0.02 SOL
+const PYRAMID_BUY = (SOL * 5n) / 100n; // 0.05 SOL per batch
+const MAX_STAKE = (SOL * 3n) / 10n; // 0.30 SOL total per position
+const MAX_EXPOSURE = (SOL * 3n) / 2n; // 1.50 SOL total across positions
 const MIN_BUY = SOL / 100n; // 0.01 SOL
 const PROBE_BUY = SOL / 100n; // 0.01 SOL guardrail probe
 const WINDOW = 30; // entry window, slots
 const PRUNE = WINDOW + 5; // keep trades this many slots back
 const ENTRY_AGE = 500; // slots since CreateEvent
 const COOLDOWN = 150; // slots after an exit before re-entry
-const MAX_HOLD = 1500; // slots
+const MAX_HOLD = 600; // slots
 const MAX_ENTRIES = 2; // fresh opens per mint
 const BUY_SLIPPAGE = 1500;
 const SELL_SLIPPAGE = 10000;
@@ -313,9 +313,9 @@ await runBot({
       const value = positionValueLamports(state, mint, pos.token_amount);
       const cost = pos.cost_lamports;
       if (value > info.peak) info.peak = value;
-      const stopLoss = value < (cost * 8n) / 10n;
+      const stopLoss = value < (cost * 9n) / 10n;
       const trailing =
-        info.peak >= (cost * 105n) / 100n && value < (info.peak * 7n) / 10n;
+        info.peak >= (cost * 105n) / 100n && value < (info.peak * 85n) / 100n;
       const maxHold =
         nowSlot - info.entrySlot > MAX_HOLD && value < cost * 2n;
       if (stopLoss || trailing || maxHold) {
@@ -372,7 +372,7 @@ await runBot({
       if (stats.netInflow < SOL) continue;
       if (stats.firstPrice <= 0) continue;
       const rise = (price - stats.firstPrice) / stats.firstPrice;
-      if (rise < 0.05 || rise > 1.5) continue;
+      if (rise < 0.1 || rise > 0.6) continue;
       if (price < stats.high * 0.95) continue;
       if (stats.secondHalf <= stats.firstHalf) continue;
       const cap = state.maxBuyLamports(mint);
