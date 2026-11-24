@@ -84,12 +84,14 @@ function trackFor(mint: string): Track {
 }
 
 // priceNow / priceOld >= num/den, exact bigint cross-multiplication.
+// ratio = (vqN/vtN) / (vqO/vtO) = vqN*vtO / (vtN*vqO); compare with den
+// on the left so num/den is not inverted.
 function priceAtLeast(vqN: bigint, vtN: bigint, vqO: bigint, vtO: bigint, num: bigint, den: bigint): boolean {
-  return vqN * vtO * num >= vtN * vqO * den;
+  return vqN * vtO * den >= vtN * vqO * num;
 }
 
 function priceAtMost(vqN: bigint, vtN: bigint, vqO: bigint, vtO: bigint, num: bigint, den: bigint): boolean {
-  return vqN * vtO * num <= vtN * vqO * den;
+  return vqN * vtO * den <= vtN * vqO * num;
 }
 
 // Value of `tokens` on this curve now, net of curve fee and one tx fee.
